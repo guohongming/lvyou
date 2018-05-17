@@ -15,7 +15,7 @@ db = database.DataBase()
 # 首页
 @movie_blueprint.route('/')
 def index():
-    # data, key = db.get_index_data()
+    data, key = db.get_index_data()
     # # print(info6s_from_db[0])
     # if "user_id" in dict(session).keys():
     #     userid = session['user_id']
@@ -23,7 +23,7 @@ def index():
     #     #print(userid)
     # else:
     #     likes = []
-    return render_template('index.html')
+    return render_template('index.html', data=data, key_index=key)
 
 
 # 单个电影信息
@@ -41,11 +41,9 @@ def item(this_id):
 
 
 # 搜索
-@movie_blueprint.route('/search', methods={'POST'})
+@movie_blueprint.route('/search/<key>', methods={'GET'})
 def search():
-    key = request.form['data']
     info_all = db.search_from_key_name(key)
-
     return render_template('search.html', key=key, search_data=info_all)
 
 
