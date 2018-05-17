@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>个性看单</title>
+    <link rel="shortcut icon" href="{{url_for('static',filename = 'image/logo.ico')}}" type="image/x-icon">
+    <link rel="icon" href="{{url_for('static',filename = 'image/logo.ico')}}" type="image/x-icon">
+    <!-- Bootstrap -->
+    <link href="{{url_for('static',filename = 'css/bootstrap.min.css')}}" rel="stylesheet">
+    <style type="text/css">
+        .single-row {
+            width:200px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        .box_relative {
+            position: relative;
+
+            bottom: 5px;
+        }
+    </style>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <a class="navbar-brand" style="color:cornflowerblue;" href="/">谷米电影</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class=><a href="/"><span class="glyphicon glyphicon-home ">&nbsp;首页 <span class="sr-only">)</span></a></li>
+                <li><a href="#">电影</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">分类 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/tag/爱情?skip=0&limit=10">爱情 Love</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/喜剧?skip=0&limit=10">喜剧 Comedy</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/剧情?skip=0&limit=10">剧情 Plot</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/动画?skip=0&limit=10">动画 Animation</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/科幻?skip=0&limit=10">科幻 Science</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/动作?skip=0&limit=10">动作 Action</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/经典?skip=0&limit=10">经典 Classic</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/悬疑?skip=0&limit=10">悬疑 Suspense</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/青春?skip=0&limit=10">青春 Youth</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/惊悚?skip=0&limit=10">惊悚 Thriller</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/感人?skip=0&limit=10">感人 Moving</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">其他 Other</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+
+            <form class="navbar-form navbar-left" method="post" action="/search">
+                <div class="form-group">
+                    <input id = "data" name ="data" type="text" class="form-control" placeholder="Search">
+                </div>
+                <button type="submit" class="btn btn-default">搜索</button>
+            </form>
+            {% if current_user.is_authenticated %}
+                <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">您好！ {{ current_user.user_name }}</a></li>
+                <li><a href="/self">私人推荐</a></li>
+                <li><a href="/logout">退出</a></li>
+                </ul>
+            {% else %}
+                 <ul class="nav navbar-nav navbar-right">
+                <li><a href="/login">登录</a></li>
+                <li><a href="/register">注册</a></li>
+            </ul>
+            {% endif %}
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+
+<div class="container">
+    <ul class="nav nav-pills">
+        <li role="presentation" class="active"><a href="#">{{ current_user.user_name }} 的个性看单</a></li>
+
+    </ul>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">根据{{ current_user.user_name }}的口味推荐 <span class="glyphicon glyphicon-cloud " title="根据喜欢的电影生成的推荐!"></span></h3>
+        </div>
+        <div class="panel-body ">
+            <div class="row">
+                {% for item in selfmovies %}
+                    <div class="col-sm-4 col-md-2" >
+                        <div class="thumbnail" style="height:330px;">
+                            <a href="./subject/{{item.id }}">
+                                <img src="{{item['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;">
+                            </a>
+                            <div class="caption" >
+
+                                <h4 class = "single-row">{{ item.name | make_name_to_one }}</h4>
+                                <p>
+                                    <a href="/subject/{{item.id }}" class="btn btn-primary" role="button">详情</a>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span  class="btn btn-default" role="button">
+                   {% if item.id  in likemovies %}
+
+                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{item.id }}">
+                    </span>
+                            {% else %}
+                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{item.id }}">
+                    </span>
+                            {% endif %}
+                        </span>
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">随机一下，试试运气。<span class="glyphicon glyphicon-refresh " title="点我随机-click it"></span></h3>
+        </div>
+        <div class="panel-body ">
+            <div class="row">
+
+                    <div class="col-sm-4 col-md-2" >
+                        <div class="thumbnail" style="height:330px;">
+                            <a href="./subject/{{selfmovies_random[0].id }}" id="00">
+                                <img src="{{selfmovies_random[0]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="01">
+                            </a>
+                            <div class="caption" >
+
+                                <h4 class = "single-row" id="02">{{ selfmovies_random[0].name | make_name_to_one }}</h4>
+                                <p>
+                                    <a href="/subject/{{selfmovies_random[0].id }}" class="btn btn-primary" role="button" id="03">详情</a>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span  class="btn btn-default" role="button">
+                   {% if selfmovies_random[0].id  in likemovies %}
+
+                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[0].id }}" id="04">
+                    </span>
+                            {% else %}
+                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[0].id }}"  id="04">
+                    </span>
+                            {% endif %}
+                        </span>
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+            <div class="col-sm-4 col-md-2" >
+                        <div class="thumbnail" style="height:330px;">
+                            <a href="./subject/{{selfmovies_random[1].id }}" id="10">
+                                <img src="{{selfmovies_random[1]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="11">
+                            </a>
+                            <div class="caption" >
+
+                                <h4 class = "single-row" id="12">{{ selfmovies_random[1].name | make_name_to_one }}</h4>
+                                <p>
+                                    <a href="/subject/{{selfmovies_random[1].id }}" class="btn btn-primary" role="button" id="13">详情</a>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span  class="btn btn-default" role="button">
+                   {% if selfmovies_random[1].id  in likemovies %}
+
+                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[1].id }}" id="14">
+                    </span>
+                            {% else %}
+                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[1].id }}" id="14">
+                    </span>
+                            {% endif %}
+                        </span>
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+            <div class="col-sm-4 col-md-2" >
+                        <div class="thumbnail" style="height:330px;">
+                            <a href="./subject/{{selfmovies_random[2].id }}" id="20">
+                                <img src="{{selfmovies_random[2]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="21">
+                            </a>
+                            <div class="caption" >
+
+                                <h4 class = "single-row" id="22">{{ selfmovies_random[2].name | make_name_to_one }}</h4>
+                                <p>
+                                    <a href="/subject/{{selfmovies_random[2].id }}" class="btn btn-primary" role="button" id="23">详情</a>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span  class="btn btn-default" role="button">
+                   {% if selfmovies_random[2].id  in likemovies %}
+
+                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[2].id }}" id="24">
+                    </span>
+                            {% else %}
+                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[2].id }}" id="24">
+                    </span>
+                            {% endif %}
+                        </span>
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+            <div class="col-sm-4 col-md-2" >
+                        <div class="thumbnail" style="height:330px;">
+                            <a href="./subject/{{selfmovies_random[3].id }}" id="30">
+                                <img src="{{selfmovies_random[3]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="31">
+                            </a>
+                            <div class="caption" >
+
+                                <h4 class = "single-row" id="32">{{ selfmovies_random[3].name | make_name_to_one }}</h4>
+                                <p>
+                                    <a href="/subject/{{selfmovies_random[3].id }}" class="btn btn-primary" role="button" id="33">详情</a>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span  class="btn btn-default" role="button">
+                   {% if selfmovies_random[3].id  in likemovies %}
+
+                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[3].id }}" id="34">
+                    </span>
+                            {% else %}
+                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[3].id }}" id="34">
+                    </span>
+                            {% endif %}
+                        </span>
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+            <div class="col-sm-4 col-md-2" >
+                        <div class="thumbnail" style="height:330px;">
+                            <a href="./subject/{{selfmovies_random[4].id }}" id="40">
+                                <img src="{{selfmovies_random[4]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="41">
+                            </a>
+                            <div class="caption" >
+
+                                <h4 class = "single-row" id="42">{{ selfmovies_random[4].name | make_name_to_one }}</h4>
+                                <p>
+                                    <a href="/subject/{{selfmovies_random[4].id }}" class="btn btn-primary" role="button" id="43">详情</a>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span  class="btn btn-default" role="button">
+                   {% if selfmovies_random[4].id  in likemovies %}
+
+                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[4].id }}" id="44">
+                    </span>
+                            {% else %}
+                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[4].id }}" id="44">
+                    </span>
+                            {% endif %}
+                        </span>
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+
+            <div class="col-sm-4 col-md-2" >
+                        <div class="thumbnail" style="height:330px;">
+                            <a href="./subject/{{selfmovies_random[5].id }}" id="50">
+                                <img src="{{selfmovies_random[5]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="51">
+                            </a>
+                            <div class="caption" >
+
+                                <h4 class = "single-row" id="52">{{ selfmovies_random[5].name | make_name_to_one }}</h4>
+                                <p>
+                                    <a href="/subject/{{selfmovies_random[5].id }}" class="btn btn-primary" role="button" id="53">详情</a>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span  class="btn btn-default" role="button">
+                   {% if selfmovies_random[5].id  in likemovies %}
+
+                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[5].id }}" id="54">
+                    </span>
+                            {% else %}
+                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[5].id }}" id="54">
+                    </span>
+                            {% endif %}
+                        </span>
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">我喜欢的电影</h3>
+        </div>
+        <div class="panel-body ">
+            <div class="row">
+                {% for item in selfmovies_hot %}
+                    <div class="col-sm-4 col-md-2" >
+                        <div class="thumbnail" style="height:330px;">
+                            <a href="./subject/{{item.id }}">
+                                <img src="{{item['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;">
+                            </a>
+                            <div class="caption" >
+
+                                <h4 class = "single-row">{{ item.name | make_name_to_one }}</h4>
+                                <p>
+                                    <a href="/subject/{{item.id }}" class="btn btn-primary" role="button">详情</a>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span  class="btn btn-default" role="button">
+                   {% if item.id  in likemovies %}
+
+                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{item.id }}">
+                    </span>
+                            {% else %}
+                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{item.id }}">
+                    </span>
+                            {% endif %}
+                        </span>
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="footer">
+
+            <div class="container">
+                <p class="text-center">Copyright &copy; 2017 blank guo.</p>
+                <p class="text-right"><a href="#top">回到顶部</a></p>
+
+            </div>
+        </div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="{{ url_for('static',filename = 'js/bootstrap.min.js') }}"></script>
+
+
+<script type=text/javascript>
+var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
+</script>
+<script type="text/javascript" >
+
+
+
+    $(function(){
+
+        $(".btn-default").click(function() {
+
+            var like_cion = $(this).find(".glyphicon");
+            var movie_id= like_cion.attr("data-class");
+            if (like_cion.hasClass("glyphicon-heart-empty")) {
+                $.getJSON($SCRIPT_ROOT + '/like',
+                        {
+                            flag: 1,
+                            movieid:movie_id
+
+                        },
+                        function (data) {
+                           like_cion.removeClass("glyphicon-heart-empty").addClass("glyphicon-heart");
+                        }
+                );
+
+
+            }
+
+            else{
+                 $.getJSON($SCRIPT_ROOT + '/like',
+                        {
+                            flag: 0,
+                            movieid:movie_id
+                        },
+                        function (data) {
+                            like_cion.removeClass("glyphicon-heart").addClass("glyphicon-heart-empty");
+                        }
+                );
+
+
+            }
+
+
+        });
+
+        $(".glyphicon-cloud").tooltip({
+            hide: {
+            effect: "explode",
+            delay: 250
+        }
+        });
+
+        $(".glyphicon-refresh").tooltip({
+            hide: {
+            effect: "explode",
+            delay: 250
+        }
+        });
+
+        $(".glyphicon-refresh").click(function(){
+            var bodypane = $('.glyphicon-refresh+.panel-body:first');
+            var itm  = bodypane.find(".col-sm-4");
+            $.getJSON($SCRIPT_ROOT + '/refresh',
+                        {
+                            refresh:1
+
+                        },
+                        function (data) {
+                            $('#00').attr('href','./subject/'+data['0']['id']);
+                            $('#01').attr('src',data['0']['url']);
+                            $('#02').text(data['0']['name']);
+                            $('#03').attr('href','./subject/'+data['0']['id']);
+                            $('#04').attr('data-class',data['0']['id']);
+
+                            $('#10').attr('href','./subject/'+data['1']['id']);
+                            $('#11').attr('src',data['1']['url']);
+                            $('#12').text(data['1']['name']);
+                            $('#13').attr('href','./subject/'+data['1']['id']);
+                            $('#14').attr('data-class',data['1']['id']);
+
+                            $('#20').attr('href','./subject/'+data['2']['id']);
+                            $('#21').attr('src',data['2']['url']);
+                            $('#22').text(data['2']['name']);
+                            $('#23').attr('href','./subject/'+data['2']['id']);
+                            $('#24').attr('data-class',data['2']['id']);
+
+                            $('#30').attr('href','./subject/'+data['3']['id']);
+                            $('#31').attr('src',data['3']['url']);
+                            $('#32').text(data['3']['name']);
+                            $('#33').attr('href','./subject/'+data['3']['id']);
+                            $('#34').attr('data-class',data['3']['id']);
+
+                            $('#40').attr('href','./subject/'+data['4']['id']);
+                            $('#41').attr('src',data['4']['url']);
+                            $('#42').text(data['4']['name']);
+                            $('#43').attr('href','./subject/'+data['4']['id']);
+                            $('#44').attr('data-class',data['4']['id']);
+
+                            $('#50').attr('href','./subject/'+data['5']['id']);
+                            $('#51').attr('src',data['5']['url']);
+                            $('#52').text(data['5']['name']);
+                            $('#53').attr('href','./subject/'+data['5']['id']);
+                            $('#54').attr('data-class',data['5']['id']);
+                        }
+                );
+
+
+        });
+    });
+</script>
+</body>
+</html>

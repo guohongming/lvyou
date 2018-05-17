@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>搜索结果</title>
+    <link rel="shortcut icon" href="{{url_for('static',filename = 'image/logo.ico')}}" type="image/x-icon">
+    <link rel="icon" href="{{url_for('static',filename = 'image/logo.ico')}}" type="image/x-icon">
+    <!-- Bootstrap -->
+    <link href="{{url_for('static',filename = 'css/bootstrap.min.css')}}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <a class="navbar-brand" style="color:cornflowerblue;" href="/">谷米电影</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li ><a href="/"><span class="glyphicon glyphicon-home ">&nbsp;首页 <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">电影</a></li>
+                <li class="dropdown active">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">分类 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                         <li><a href="/tag/爱情?skip=0&limit=10">爱情 Love</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/喜剧?skip=0&limit=10">喜剧 Comedy</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/剧情?skip=0&limit=10">剧情 Plot</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/动画?skip=0&limit=10">动画 Animation</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/科幻?skip=0&limit=10">科幻 Science</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/动作?skip=0&limit=10">动作 Action</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/经典?skip=0&limit=10">经典 Classic</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/悬疑?skip=0&limit=10">悬疑 Suspense</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/青春?skip=0&limit=10">青春 Youth</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/惊悚?skip=0&limit=10">惊悚 Thriller</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/感人?skip=0&limit=10">感人 Moving</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">其他 Other</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <form class="navbar-form navbar-left" method="post" action="/search">
+                <div class="form-group">
+                    <input id = "data" name ="data" type="text" class="form-control" placeholder="Search">
+                </div>
+                <button type="submit" class="btn btn-default">搜索</button>
+            </form>
+          {% if current_user.is_authenticated %}
+                <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">您好！ {{ current_user.user_name }}</a></li>
+                <li><a href="/self">私人推荐</a></li>
+                <li><a href="/logout">退出</a></li>
+                </ul>
+            {% else %}
+                 <ul class="nav navbar-nav navbar-right">
+                <li><a href="/login">登录</a></li>
+                <li><a href="/register">注册</a></li>
+            </ul>
+            {% endif %}
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+
+<div class="container">
+
+    <div>
+        <h4>搜索关键词：{{ key }} 结果如下</h4>
+
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ key }}</h3>
+        </div>
+        <div class="panel-body ">
+            <ul class="list-group">
+
+                {% for item in search_data %}
+                <li class="list-group-item list-group-item-success">
+                    <div class="row">
+                        <div class="col-sm-2 col-md-1">
+                            <a href="#top">
+                                <img class = 'img-thumbnail'src="{{item.img_url}}" alt="Responsive image">
+                            </a>
+                        </div>
+
+                        <span class="label label-info">主演</span>：
+                    <span >
+                        {{ item.stars | join(' ') | truncate(75)}}
+                    </span>
+                        <br>
+                        <br>
+                        <br>
+
+                        <span  class="btn btn-default" role="button" style="background: transparent;">
+                   {% if item.id  in likemovies %}
+
+                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{item.id }}">
+                    </span>
+                            {% else %}
+                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{item.id }}">
+                    </span>
+                            {% endif %}
+                        </span>
+                    &nbsp;&nbsp;  &nbsp;&nbsp;  &nbsp;&nbsp;
+                        <span class="label label-warning">评分</span>：
+                    <span>
+                        {{ item.score }}
+                    </span>
+                        &nbsp;&nbsp;  &nbsp;&nbsp;  &nbsp;&nbsp;
+
+                        <span class="label label-default">片名</span>：
+                        <span>
+                        《{{ item.name }}》
+                        </span>
+                        <a href="/subject/{{ item.id }}" ><span style="float :right"class="label label-primary">影片详情</span></a>
+                    </div>
+
+                </li>
+                {% endfor %}
+            </ul>
+
+    </div>
+</div>
+
+
+
+
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        <li>
+           显示前20条！！
+        </li>
+    </ul>
+</nav>
+
+</div>
+<div class="footer">
+
+    <div class="container">
+        <p class="text-center">Copyright &copy; 2017 blank guo.</p>
+        <p class="text-right"><a href="#top">回到顶部</a></p>
+
+    </div>
+</div>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="{{ url_for('static',filename = 'js/bootstrap.min.js') }}"></script>
+<script type=text/javascript>
+var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
+</script>
+<script type="text/javascript" >
+
+
+
+    $(function(){
+
+        $(".btn-default").click(function() {
+
+            var like_cion = $(this).find(".glyphicon");
+            var movie_id= like_cion.attr("data-class");
+            if (like_cion.hasClass("glyphicon-heart-empty")) {
+                $.getJSON($SCRIPT_ROOT + '/like',
+                        {
+                            flag: 1,
+                            movieid:movie_id
+
+                        },
+                        function (data) {
+                           like_cion.removeClass("glyphicon-heart-empty").addClass("glyphicon-heart");
+                        }
+                );
+
+
+            }
+
+            else{
+                 $.getJSON($SCRIPT_ROOT + '/like',
+                        {
+                            flag: 0,
+                            movieid:movie_id
+                        },
+                        function (data) {
+                            like_cion.removeClass("glyphicon-heart").addClass("glyphicon-heart-empty");
+                        }
+                );
+
+
+            }
+
+
+        });
+    });
+</script>
+
+
+</body>
+</html>
