@@ -99,8 +99,12 @@
             </form>
 
             {% if current_user.is_authenticated %}
+
+
+
                 <ul class="nav navbar-nav navbar-right">
                 <li><a href="#">您好！ {{ current_user.user_name }}</a></li>
+                 <li><a href="/order">我的订单</a></li>
                 <li><a href="/self">私人推荐</a></li>
                 <li><a href="/logout">退出</a></li>
                 </ul>
@@ -200,9 +204,11 @@
                            style="">详情</a>
 
                 <br><br>
+                 {% if product.productId  in orders %}
                  <span class="label label-default pull-right">
                      购买过
                  </span>
+                 {% endif %}
              </div>
         </div>
         {%endfor%}

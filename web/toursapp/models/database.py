@@ -126,7 +126,10 @@ class DataBase(object):
 
     def get_orders_from_id(self, id):
         user = self.order_list.find_one({'id': int(id)})
-        orders = user['order_list']
+        if user:
+            orders = user['order_list']
+        else:
+            orders = []
         return orders
 
     # def from_user_like_to_recommend(self, id):

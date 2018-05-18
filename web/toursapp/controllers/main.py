@@ -59,12 +59,6 @@ def register():
         db_user.session.commit()
         flash("Your user has been created, please login.", category="success")
 
-        user = User.query.filter_by(user_name=form.username.data).first()
-        # print(user.id)
-        like = []
-        recom = []
-        db.movie_db.userinfo.insert_one({
-            'id': user.id, 'like_movies': like, 'recommend_movies': recom})
         return redirect(url_for('.login'))
 
     return render_template('register.html', form=form)

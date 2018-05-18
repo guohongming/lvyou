@@ -17,13 +17,14 @@ db = database.DataBase()
 def index():
     data, key = db.get_index_data()
     # # print(info6s_from_db[0])
-    # if "user_id" in dict(session).keys():
-    #     userid = session['user_id']
-    #     likes = db.get_likes_from_id(userid)
-    #     #print(userid)
-    # else:
-    #     likes = []
-    return render_template('index.html', data=data, key_index=key)
+    if "user_id" in dict(session).keys():
+        userid = session['user_id']
+        orders = db.get_orders_from_id(userid)
+        #print(userid)
+    else:
+        orders = []
+    print(data)
+    return render_template('index.html', data=data, key_index=key,orders = orders)
 
 
 # 单个产品信息
@@ -81,8 +82,8 @@ def self():
         itm = db.get_iterm_data(i)
         selfmovies_hot.append(itm)
 
-    #if len(selfmovies_hot)>6:
-     #   selfmovies_hot = selfmovies_hot[:6]
+        #if len(selfmovies_hot)>6:
+        #   selfmovies_hot = selfmovies_hot[:6]
     likes = db.get_likes_from_id(int(id))
 
     return render_template('self.html', selfmovies=self_movies, selfmovies_random=selfmovies_random, selfmovies_hot=selfmovies_hot, likemovies=likes)
