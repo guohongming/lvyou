@@ -36,9 +36,8 @@ class DataBase(object):
 
     #  根据id 查询信息,返回一条记录的数据
     def get_iterm_data(self, this_id):
-
-        item_from_db = self.product_info.find_one({'product_id': this_id})
-
+        item_from_db = self.product_info.find_one({'productId': int(this_id)})
+        print(item_from_db)
         return item_from_db
 
     # # 根据分类/skip/limit 查询
@@ -56,10 +55,10 @@ class DataBase(object):
         info_all = []
         info_ids = []
         for it in info:
-            if not it['product_id'] in info_ids:
+            if not it['productId'] in info_ids:
                 info_all.append(it)
         for it in info_cat:
-            if not it['product_id'] in info_ids:
+            if not it['productId'] in info_ids:
                 info_all.append(it)
         return info_all
 

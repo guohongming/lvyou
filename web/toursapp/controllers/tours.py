@@ -19,11 +19,14 @@ def index():
     # # print(info6s_from_db[0])
     if "user_id" in dict(session).keys():
         userid = session['user_id']
-        orders = db.get_orders_from_id(userid)
-        #print(userid)
+        orders = []
+        orders_list = db.get_orders_from_id(userid)
+        for i in orders_list:
+            orders.append(int(i["product_id"]))
+
     else:
         orders = []
-    print(data)
+    print(orders)
     return render_template('index.html', data=data, key_index=key,orders = orders)
 
 
@@ -32,19 +35,32 @@ def index():
 def item(this_id):
     if "user_id" in dict(session).keys():
         userid = session['user_id']
-        orders = db.get_orders_from_id(userid)
-        # print(userid)
+        orders = []
+        orders_list = db.get_orders_from_id(userid)
+        for i in orders_list:
+            orders.append(int(i["product_id"]))
     else:
         orders = []
     item_info = db.get_iterm_data(this_id)
-    return render_template('item.html', item=item_info,  order_list=orders)
+    # print(item_info)
+    return render_template('item.html', product=item_info,  orders=orders)
 
 
 # 搜索
-@movie_blueprint.route('/search/<key>', methods={'GET'})
+@movie_blueprint.route('/search', methods={'POST'})
 def search():
+    if "user_id" in dict(session).keys():
+        user_id = session['user_id']
+        orders = []
+        orders_list = db.get_orders_from_id(user_id)
+        for i in orders_list:
+            orders.append(int(i["product_id"]))
+        # print(user_id)
+    else:
+        orders = []
+    key = request.form['data']
     info_all = db.search_from_key_name(key)
-    return render_template('search.html', key=key, search_data=info_all)
+    return render_template('search.html', key=key, search_data=info_all,orders = orders)
 
 
 # 分类/分页
@@ -53,7 +69,10 @@ def classify(this_tag):
 
     if "user_id" in dict(session).keys():
         user_id = session['user_id']
-        orders = db.get_orders_from_id(user_id)
+        orders = []
+        orders_list = db.get_orders_from_id(user_id)
+        for i in orders_list:
+            orders.append(int(i["product_id"]))
         # print(user_id)
     else:
         orders = []
@@ -62,7 +81,7 @@ def classify(this_tag):
     if int(skip) < 0:
         skip = 0
     data = db.classify_data_from_tag(this_tag, skip, 10)
-    # print(data)
+    print(data)
     pre_skip = int(skip)-10
     next_skip = int(skip)+10
     return render_template('classify.html', classify_data=data, the_tag=this_tag, the_skip=skip, the_limit=10,
@@ -87,6 +106,19 @@ def self():
     likes = db.get_likes_from_id(int(id))
 
     return render_template('self.html', selfmovies=self_movies, selfmovies_random=selfmovies_random, selfmovies_hot=selfmovies_hot, likemovies=likes)
+
+
+@movie_blueprint.route('/order', methods={'GET'})
+@login_required
+def order():
+    id = session['user_id']
+    orders = db.get_orders_from_id(id)
+    result = []
+    for item in orders:
+        item["product_id"]
+        item["time"]
+        result.append({"time": item["time"], "product": db.get_iterm_data(item["product_id"])})
+    return render_template('order.html', order_list=result)
 
 
 @movie_blueprint.errorhandler(404)

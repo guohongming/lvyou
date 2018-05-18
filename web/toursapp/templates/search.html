@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>搜索结果</title>
-    <link rel="shortcut icon" href="{{url_for('static',filename = 'image/logo.ico')}}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{url_for('static',filename = 'image/logo.ico
+    <title>搜索结果</title>')}}" type="image/x-icon">
     <link rel="icon" href="{{url_for('static',filename = 'image/logo.ico')}}" type="image/x-icon">
     <!-- Bootstrap -->
     <link href="{{url_for('static',filename = 'css/bootstrap.min.css')}}" rel="stylesheet">
@@ -44,7 +44,12 @@
                 <li class="dropdown active">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">分类 <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                          <li><a href="/tag/爱情?skip=0&limit=10">跟团</a></li>                        <li role="separator" class="divider"></li>                        <li><a href="/tag/喜剧?skip=0&limit=10">自由行</a></li>                        <li role="separator" class="divider"></li>                        <li><a href="/tag/剧情?skip=0&limit=10">自驾</a></li>                        <li role="separator" class="divider"></li>
+                          <li><a href="/tag/跟团游?skip=0&limit=10">跟团游</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/自由行?skip=0&limit=10">自由行</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/自驾游?skip=0&limit=10">自驾游</a></li>
+                        <li role="separator" class="divider"></li>
                     </ul>
                 </li>
             </ul>
@@ -57,6 +62,7 @@
           {% if current_user.is_authenticated %}
                 <ul class="nav navbar-nav navbar-right">
                 <li><a href="#">您好！ {{ current_user.user_name }}</a></li>
+                    <li><a href="/order">我的订单</a></li>
                 <li><a href="/self">私人推荐</a></li>
                 <li><a href="/logout">退出</a></li>
                 </ul>
@@ -77,69 +83,64 @@
         <h4>搜索关键词：{{ key }} 结果如下</h4>
 
     </div>
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h3 class="panel-title">{{ key }}</h3>
-        </div>
-        <div class="panel-body ">
-            <ul class="list-group">
 
-                {% for item in search_data %}
-                <li class="list-group-item list-group-item-success">
-                    <div class="row">
-                        <div class="col-sm-2 col-md-1">
-                            <a href="#top">
-                                <img class = 'img-thumbnail'src="{{item.img_url}}" alt="Responsive image">
-                            </a>
-                        </div>
 
-                        <span class="label label-info">主演</span>：
-                    <span >
-                        {{ item.stars | join(' ') | truncate(75)}}
-                    </span>
-                        <br>
-                        <br>
-                        <br>
-
-                        <span  class="btn btn-default" role="button" style="background: transparent;">
-                   {% if item.id  in likemovies %}
-
-                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{item.id }}">
-                    </span>
-                            {% else %}
-                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{item.id }}">
-                    </span>
-                            {% endif %}
-                        </span>
-                    &nbsp;&nbsp;  &nbsp;&nbsp;  &nbsp;&nbsp;
-                        <span class="label label-warning">评分</span>：
-                    <span>
-                        {{ item.score }}
-                    </span>
-                        &nbsp;&nbsp;  &nbsp;&nbsp;  &nbsp;&nbsp;
-
-                        <span class="label label-default">片名</span>：
-                        <span>
-                        《{{ item.name }}》
-                        </span>
-                        <a href="/subject/{{ item.id }}" ><span style="float :right"class="label label-primary">影片详情</span></a>
+                {% for product in search_data %}
+                    <div class="col-sm-11 col-md-11">
+            <div class="thumbnail" style="height:120px;">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <a href="./subject/">
+                            <img src="{{product.picUrl}}" class="img-responsive pull-left" alt="Responsive image"
+                                 style=" height:100px;">
+                        </a>
                     </div>
+                    <div class="col-sm-9">
+                        <span style="color: #11a3fc"> {{product.name}}</span><br>
+                        <span class="label label-success">{{ product.classBrandName }}</span>
+                        &nbsp;
+                        <span style="color: #3c763d"> 出发城市:</span> {{product.departCity}}
+                         &nbsp;
+                        <span style="color: #985f0d">满意度:</span> {{product.satisfaction}}%
+                         &nbsp;
+                        <span style="color: slateblue">出游人数:</span> {{product.travelNum}}人
+                         &nbsp;
+                        <span style="color: #28a4c9">钻级:</span>{{ product.productLevel }}
+                        <br>
+                         <span style="color: #28a4c9">推荐理由:</span>{{ product.productFeature }}
+                        <br>
+                        {% for tag in product.conditionTagCombination %}
+                            <span class="label label-info"> {{ tag }}</span>
+                        {% endfor %}
 
-                </li>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-1 col-md-1">
+             <div class="thumbnail" style="height:120px;">
+                 <span href="./subject/" class=" btn-info pull-right "
+                           style="">订购</span>
+             <br><br>
+                <a href="./subject/{{ product.productId }}" class=" btn-success pull-right " role="button"
+                           style="">详情</a>
+
+                <br><br>
+                 {% if product.productId  in orders %}
+                 <span class="label label-default pull-right">
+                     购买过
+                 </span>
+                 {% endif %}
+             </div>
+        </div>
                 {% endfor %}
             </ul>
-
-    </div>
-</div>
-
 
 
 
 <nav aria-label="Page navigation">
     <ul class="pagination">
-        <li>
-           显示前20条！！
-        </li>
+
     </ul>
 </nav>
 
