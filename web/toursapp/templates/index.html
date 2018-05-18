@@ -170,8 +170,22 @@
                         </a>
                     </div>
                     <div class="col-sm-9">
-                        <span> {{product.name}}</span><br>
+                        <span style="color: #11a3fc"> {{product.name}}</span><br>
+                        <span class="label label-success">{{ product.classBrandName }}</span>
+                        &nbsp;
                         <span style="color: #3c763d"> 出发城市:</span> {{product.departCity}}
+                         &nbsp;
+                        <span style="color: #985f0d">满意度:</span> {{product.satisfaction}}%
+                         &nbsp;
+                        <span style="color: slateblue">出游人数:</span> {{product.travelNum}}人
+                         &nbsp;
+                        <span style="color: #28a4c9">钻级:</span>{{ product.productLevel }}
+                        <br>
+                         <span style="color: #28a4c9">推荐理由:</span>{{ product.productFeature }}
+                        <br>
+                        {% for tag in product.conditionTagCombination %}
+                            <span class="label label-info"> {{ tag }}</span>
+                        {% endfor %}
 
                     </div>
                 </div>
