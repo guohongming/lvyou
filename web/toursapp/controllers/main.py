@@ -7,13 +7,15 @@ from flask import (render_template,
                    url_for,
                    request,
                    flash,
-                    jsonify,
+                   jsonify,
                    session)
 
 from toursapp.models.forms import LoginForm, RegisterForm
 from toursapp.models.models import User, db_user
 from flask_login import login_user, logout_user, current_user, login_required
 from toursapp.models import database
+import datetime
+
 db = database.DataBase()
 main_blueprint = Blueprint(
     'main',
@@ -24,7 +26,6 @@ main_blueprint = Blueprint(
 
 @main_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
-
     form = LoginForm()
     # print(form.username.data)
     if form.validate_on_submit():
@@ -60,10 +61,10 @@ def register():
 
         user = User.query.filter_by(user_name=form.username.data).first()
         # print(user.id)
-        like =[]
+        like = []
         recom = []
         db.movie_db.userinfo.insert_one({
-            'id':user.id,'like_movies':like,'recommend_movies':recom})
+            'id': user.id, 'like_movies': like, 'recommend_movies': recom})
         return redirect(url_for('.login'))
 
     return render_template('register.html', form=form)
@@ -73,29 +74,30 @@ def register():
 def test():
     return render_template('test.html')
 
+
 @main_blueprint.route('/add')
 def add_numbers():
     a = request.args.get('a', 0, type=int)
     b = request.args.get('b', 0, type=int)
-    print(jsonify(result = a + b))
+    print(jsonify(result=a + b))
 
-    return jsonify(result = a + b)
+    return jsonify(result=a + b)
 
 
 @main_blueprint.route('/like')
 @login_required
 def likemovie():
     userid = session.get('user_id')
-    flag = request.args.get('flag',0,type=int)
-    movieid = request.args.get('movieid',0,type=str)
-    if flag==1:
-        db.add_likemovie_to_userid(userid,movieid)
+    flag = request.args.get('flag', 0, type=int)
+    product_id = request.args.get('product_id', 0, type=str)
+    now =datetime.datetime.now()
+
+    if flag == 1:
+        db.add_like_product_to_userid(userid, product_id, now)
 
     else:
-        db.remove_likemovie_from_userid(userid,movieid)
-    return jsonify(result = 1)
-
-
+        db.remove_like_product_from_userid(userid, product_id)
+    return jsonify(result=1)
 
 
 @main_blueprint.route('/refresh')
@@ -105,12 +107,11 @@ def refresh():
     random_movie = {}
     i = 0
     for itm in movies:
-
         it = {}
-        it['id']=itm['id']
-        it['url']=itm['img_url']
-        it['name']=itm['name'][:8]
-        random_movie[str(i)]=it
-        i+=1
+        it['id'] = itm['id']
+        it['url'] = itm['img_url']
+        it['name'] = itm['name'][:8]
+        random_movie[str(i)] = it
+        i += 1
 
     return jsonify(random_movie)

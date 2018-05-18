@@ -26,18 +26,17 @@ def index():
     return render_template('index.html', data=data, key_index=key)
 
 
-# 单个电影信息
-
+# 单个产品信息
 @movie_blueprint.route('/subject/<this_id>')
 def item(this_id):
     if "user_id" in dict(session).keys():
         userid = session['user_id']
-        likes = db.get_likes_from_id(userid)
+        orders = db.get_orders_from_id(userid)
         # print(userid)
     else:
-        likes = []
+        orders = []
     item_info = db.get_iterm_data(this_id)
-    return render_template('item.html', item=item_info,  likemovies=likes)
+    return render_template('item.html', item=item_info,  order_list=orders)
 
 
 # 搜索
@@ -52,11 +51,11 @@ def search():
 def classify(this_tag):
 
     if "user_id" in dict(session).keys():
-        userid = session['user_id']
-        likes = db.get_likes_from_id(userid)
-        # print(userid)
+        user_id = session['user_id']
+        orders = db.get_orders_from_id(user_id)
+        # print(user_id)
     else:
-        likes = []
+        orders = []
     skip = request.args.get('skip')
     limit = request.args.get('limit')
     if int(skip) < 0:
@@ -66,7 +65,7 @@ def classify(this_tag):
     pre_skip = int(skip)-10
     next_skip = int(skip)+10
     return render_template('classify.html', classify_data=data, the_tag=this_tag, the_skip=skip, the_limit=10,
-                           Previous=pre_skip, next=next_skip, likemovies=likes)
+                           Previous=pre_skip, next=next_skip, orders=orders)
 
 
 @movie_blueprint.route('/self', methods={'GET'})

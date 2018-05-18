@@ -11,6 +11,8 @@ class DataBase(object):
         self.client = pymongo.MongoClient('47.94.223.220', 20188)
         self.lvyou = self.client.lvyou
         self.product_info = self.lvyou.product_info
+        self.order_list = self.lvyou.order_list
+        self.similar = self.lvyou.similar
 
     # 获取首页所需要的数据： 分类下的6个电影信息
 
@@ -24,7 +26,6 @@ class DataBase(object):
         info_3 = self.product_info.find({'classBrandName': "自驾游"}).limit(6)
 
         data = {}
-
         data['跟团游'] = info_1
         data['自助游'] = info_2
         data['自驾游'] = info_3
@@ -33,33 +34,35 @@ class DataBase(object):
 
         return data, key
 
-    # #  根据id 查询信息,返回一条记录的数据 和 主演的前8
-    # def get_iterm_data(self, this_id):
-    #
-    #     item_from_db = self.movie_db.movieinfo.find_one({'id': this_id})
-    #
-    #     return item_from_db
-    #
+    #  根据id 查询信息,返回一条记录的数据
+    def get_iterm_data(self, this_id):
+
+        item_from_db = self.product_info.find_one({'product_id': this_id})
+
+        return item_from_db
+
     # # 根据分类/skip/limit 查询
-    # def classify_data_from_tag(self, tag, skip, limit=10):
-    #
-    #     skip = int(skip)
-    #     limit = int(limit)
-    #     info = self.movie_db.movieinfo.find({'types': {'$regex': tag}}).skip(skip).limit(limit)
-    #     return info
-    #
-    # # 根据搜索的key 查询数据
-    # def search_from_key_name(self, key):
-    #
-    #     info = self.movie_db.movieinfo.find({'name': {'$regex': key}}).skip(0).limit(20)
-    #     info_stairs = self.movie_db.movieinfo.find({'stars': {'$regex': key}}).skip(0).limit(20)
-    #     info_all = []
-    #     for it in info:
-    #         info_all.append(it)
-    #     for it in info_stairs:
-    #         info_all.append(it)
-    #     return info_all
-    #
+    def classify_data_from_tag(self, tag, skip, limit=10):
+
+        skip = int(skip)
+        limit = int(limit)
+        info = self.product_info.find({'classBrandName': {'$regex': tag}}).skip(skip).limit(limit)
+        return info
+
+    # 根据搜索的key 查询数据
+    def search_from_key_name(self, key):
+        info = self.product_info.find({'name': {'$regex': key}}).limit(20)
+        info_cat= self.product_info.find({'classBrandName': {'$regex': key}}).limit(20)
+        info_all = []
+        info_ids = []
+        for it in info:
+            if not it['product_id'] in info_ids:
+                info_all.append(it)
+        for it in info_cat:
+            if not it['product_id'] in info_ids:
+                info_all.append(it)
+        return info_all
+
     # def find_user_name(self, name):
     #     a_user = self.movie_db.userinfo.find_one({'name': name})
     #
@@ -75,16 +78,16 @@ class DataBase(object):
     #     else:
     #         return False
     #
-    # def get_self_movies(self, id):
-    #     user_info = self.movie_db.userinfo.find_one({'id': int(id)})
-    #     # print(user_info)
-    #     ids = user_info['recommend_movies']
-    #     # print(ids)
-    #     movies = []
-    #     for id_a in ids:
-    #         movie_a = self.movie_db.movieinfo.find_one({'id': id_a})
-    #         movies.append(movie_a)
-    #     return movies
+    def get_self_orders(self, id):
+        user_info = self.order_list.find_one({'id': int(id)})
+        # print(user_info)
+        ids = user_info['orders']
+        # print(ids)
+        orders = []
+        for id_a in ids:
+            order_a = self.order_list.find_one({'id': id_a})
+            orders.append(order_a)
+        return orders
     #
     # def get_random_movies(self):
     #     num = random.choice(range(0, 1990))
@@ -98,25 +101,34 @@ class DataBase(object):
     #         ids.append(user['id'])
     #     return ids
     #
-    # def add_likemovie_to_userid(self, user_id, movie_id):
-    #     user = self.movie_db.userinfo.find_one({'id': int(user_id)})
-    #     likemovies = list(user['like_movies'])
-    #     likemovies.insert(0, movie_id)
-    #     self.movie_db.userinfo.update({"id": int(user_id)}, {"$set": {"like_movies": likemovies}})
-    #     return 1
-    #
-    # def remove_likemovie_from_userid(self, user_id, movie_id):
-    #     user = self.movie_db.userinfo.find_one({'id': int(user_id)})
-    #     likemovies = list(user['like_movies'])
-    #     likemovies.remove(movie_id)
-    #     self.movie_db.userinfo.update({"id": int(user_id)}, {"$set": {"like_movies": likemovies}})
-    #     return 1
-    #
-    # def get_likes_from_id(self, id):
-    #     user = self.movie_db.userinfo.find_one({'id': int(id)})
-    #     likes = user['like_movies']
-    #     return likes
-    #
+
+    def add_like_product_to_userid(self, user_id, product_id, now):
+        user = self.order_list.find_one({'id': int(user_id)})
+        if user:
+            like_products = list(user['order_list'])
+            like_products.insert(0, {"product_id":product_id, "time":now})
+            self.order_list.update({"id": int(user_id)}, {"$set": {"order_list": like_products}})
+        else:
+            like_products = [{"product_id":product_id, "time":now}]
+            data = {"id": int(user_id), "order_list": like_products}
+            self.order_list.insert_one(data)
+        return 1
+
+    def remove_like_product_from_userid(self, user_id, product_id):
+        user = self.order_list.find_one({'id': int(user_id)})
+        like_products = list(user['order_list'])
+        products = []
+        for i in like_products:
+            if i["product_id"] != product_id:
+                products.append(i)
+        self.order_list.update({"id": int(user_id)}, {"$set": {"order_list": products}})
+        return 1
+
+    def get_orders_from_id(self, id):
+        user = self.order_list.find_one({'id': int(id)})
+        orders = user['order_list']
+        return orders
+
     # def from_user_like_to_recommend(self, id):
     #     user = self.movie_db.userinfo.find_one({'id': int(id)})
     #     likemovies = user['like_movies']

@@ -22,6 +22,27 @@
 
           bottom: 5px;
         }
+
+        .logo {
+            padding: 0;
+        }
+
+        #myCarousel {
+            margin: 50px 0 0 0;
+        }
+
+        #navbar-collapse ul {
+            margin-top: 0;
+        }
+
+        .carousel-inner img {
+            margin: 0 auto;
+        }
+
+        .carousel-control {
+            font-size: 100px;
+
+        }
     </style>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -94,7 +115,39 @@
     </div><!-- /.container-fluid -->
 </nav>
 
-<div class="container">
+<div id="myCarousel" class="carousel slide">
+        <ol class="carousel-indicators">
+            <li data-target="#myCarousel" data-slide-to="0" class="active"> </li>
+            <li data-target="#myCarousel" data-slide-to="1"> </li>
+            <li data-target="#myCarousel" data-slide-to="2"> </li>
+
+        </ol>
+        <div class="carousel-inner">
+            <div class="item active" style="background:#223240;">
+                <img src="https://m1.tuniucdn.com/fb2/t1/G5/M00/2B/62/Cii-slpLKZ-IE1txAAC60aKBsfQAABkkAGB0RoAALrp35.jpeg" alt="第二张" />
+
+                <!--<img src="http://m.tuniucdn.com/fb2/t1/G2/M00/79/94/Cii-T1fknmWIN4unAAKX4Yj7fAoAACs4AOskScAApf5773_w320_h180_c1_t0.jpg" alt="第一张" />-->
+            </div>
+            <div class="item" style="background:#F5E4DC;">
+                <img src="https://m2.tuniucdn.com/fb2/t1/G5/M00/3C/2C/Cii-slpcYyqITfHFAAGk19SH75sAACU2QKg0dQAAaTv30.jpeg" alt="第二张" />
+                <!--<img src="http://m.tuniucdn.com/fb2/t1/G2/M00/17/9A/Cii-TFgyvh2IPgSBACFgWNopAuwAAEqAQDqbswAIWBw456_w320_h180_c1_t0.jpg" alt="第二张" />-->
+            </div>
+            <div class="item" style="background:#DE2A2D;">
+                <img src="https://m1.tuniucdn.com/fb2/t1/G3/M00/39/5E/Cii_Nlll5D2ICwZbAAFxXYW-2_gAADYoQOKsEMAAXF1965.png" alt="第二张" />
+                <!--<img src="http://m.tuniucdn.com/fb2/t1/G4/M00/55/EB/Cii-VVnA31OIZj_bAC5XXcXb4UgAABYewHMrMYALld1830_w320_h180_c1_t0.jpg" alt="第三张" />-->
+            </div>
+
+        </div>
+
+        <a href="#myCarousel" data-slide="prev" class="carousel-control left">
+            <span class="glyphicon glyphicon-chevron-left"> </span>
+        </a>
+        <a href="#myCarousel" data-slide="next" class="carousel-control right">
+            <span class="glyphicon glyphicon-chevron-right"> </span>
+        </a>
+</div>
+
+<div class="container" style="margin-top: 50px">
 
     {% for item in data %}
 
@@ -107,7 +160,7 @@
 
     <div class="row">
         {% for product in data[item] %}
-        <div class="col-sm-10 col-md-10">
+        <div class="col-sm-11 col-md-11">
             <div class="thumbnail" style="height:120px;">
                 <div class="row">
                     <div class="col-sm-3">
@@ -117,12 +170,26 @@
                         </a>
                     </div>
                     <div class="col-sm-9">
-                        <span> {{product.name}}}</span>
-                        <a href="./subject/" class="btn btn-success pull-right " role="button"
-                           style="position:absolute;bottom: 0;">详情</a>
+                        <span> {{product.name}}</span><br>
+                        <span style="color: #3c763d"> 出发城市:</span> {{product.departCity}}
+
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="col-sm-1 col-md-1">
+             <div class="thumbnail" style="height:120px;">
+                 <span href="./subject/" class=" btn-info pull-right "
+                           style="">订购</span>
+             <br><br>
+                <a href="./subject/" class=" btn-success pull-right " role="button"
+                           style="">详情</a>
+
+                <br><br>
+                 <span class="label label-default pull-right">
+                     购买过
+                 </span>
+             </div>
         </div>
         {%endfor%}
 
@@ -189,7 +256,10 @@ var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
 </script>
 <script type="text/javascript" >
 
-
+    //自动播放
+    $("#myCarousel").carousel({
+        interval :5000,
+    });
 
     $(function(){
 
