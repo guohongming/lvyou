@@ -87,11 +87,11 @@ class DataBase(object):
             order_a = self.order_list.find_one({'id': id_a})
             orders.append(order_a)
         return orders
-    #
-    # def get_random_movies(self):
-    #     num = random.choice(range(0, 1990))
-    #     info = self.movie_db.movieinfo.find().skip(num).limit(6)
-    #     return info
+
+    def get_random_movies(self):
+        num = random.choice(range(0, 250))
+        info = self.product_info.find().skip(num).limit(20)
+        return info
     #
     # def get_userid(self):
     #     users = self.movie_db.userinfo.find()

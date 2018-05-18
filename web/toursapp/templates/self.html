@@ -58,7 +58,12 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">分类 <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                         <li><a href="/tag/爱情?skip=0&limit=10">跟团</a></li>                        <li role="separator" class="divider"></li>                        <li><a href="/tag/喜剧?skip=0&limit=10">自由行</a></li>                        <li role="separator" class="divider"></li>                        <li><a href="/tag/剧情?skip=0&limit=10">自驾</a></li>                        <li role="separator" class="divider"></li>
+                           <li><a href="/tag/跟团游?skip=0&limit=10">跟团游</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/自由行?skip=0&limit=10">自由行</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/tag/自驾游?skip=0&limit=10">自驾游</a></li>
+                        <li role="separator" class="divider"></li>
                     </ul>
                 </li>
             </ul>
@@ -73,6 +78,7 @@
             {% if current_user.is_authenticated %}
                 <ul class="nav navbar-nav navbar-right">
                 <li><a href="#">您好！ {{ current_user.user_name }}</a></li>
+                     <li><a href="/order">我的订单</a></li>
                 <li><a href="/self">私人推荐</a></li>
                 <li><a href="/logout">退出</a></li>
                 </ul>
@@ -89,224 +95,120 @@
 
 <div class="container">
     <ul class="nav nav-pills">
-        <li role="presentation" class="active"><a href="#">{{ current_user.user_name }} 的个性看单</a></li>
+        <li role="presentation" class="active"><a href="#">{{ current_user.user_name }} 的个性推荐</a></li>
 
     </ul>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">根据{{ current_user.user_name }}的口味推荐 <span class="glyphicon glyphicon-cloud " title="根据喜欢的旅游生成的推荐!"></span></h3>
+            <h3 class="panel-title">个性推荐 <span class="glyphicon glyphicon-cloud " title="根据喜欢的旅游生成的推荐!"></span></h3>
         </div>
         <div class="panel-body ">
             <div class="row">
-                {% for item in selfmovies %}
-                    <div class="col-sm-4 col-md-2" >
-                        <div class="thumbnail" style="height:330px;">
-                            <a href="./subject/{{item.id }}">
-                                <img src="{{item['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;">
-                            </a>
-                            <div class="caption" >
+                {% if self_products %}
+                       <h4>根据您的订单推荐：</h4>
+                    {% for product in self_products %}
 
-                                <h4 class = "single-row">{{ item.name | make_name_to_one }}</h4>
-                                <p>
-                                    <a href="/subject/{{item.id }}" class="btn btn-primary" role="button">详情</a>
-                        &nbsp; &nbsp; &nbsp; &nbsp;
-                                    <span  class="btn btn-default" role="button">
-                   {% if item.id  in likemovies %}
-
-                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{item.id }}">
-                    </span>
-                            {% else %}
-                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{item.id }}">
-                    </span>
-                            {% endif %}
-                        </span>
-                                </p>
-
-                            </div>
-                        </div>
+                         <div class="col-sm-11 col-md-11">
+            <div class="thumbnail" style="height:120px;">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <a href="./subject/">
+                            <img src="{{product.picUrl}}" class="img-responsive pull-left" alt="Responsive image"
+                                 style=" height:100px;">
+                        </a>
                     </div>
+                    <div class="col-sm-9">
+                        <span style="color: #11a3fc"> {{product.name}}</span><br>
+                        <span class="label label-success">{{ product.classBrandName }}</span>
+                        &nbsp;
+                        <span style="color: #3c763d"> 出发城市:</span> {{product.departCity}}
+                         &nbsp;
+                        <span style="color: #985f0d">满意度:</span> {{product.satisfaction}}%
+                         &nbsp;
+                        <span style="color: slateblue">出游人数:</span> {{product.travelNum}}人
+                         &nbsp;
+                        <span style="color: #28a4c9">钻级:</span>{{ product.productLevel }}
+                        <br>
+                         <span style="color: #28a4c9">推荐理由:</span>{{ product.productFeature }}
+                        <br>
+                        {% for tag in product.conditionTagCombination %}
+                            <span class="label label-info"> {{ tag }}</span>
+                        {% endfor %}
 
-
-                {% endfor %}
-
+                    </div>
+                </div>
             </div>
+        </div>
+        <div class="col-sm-1 col-md-1">
+             <div class="thumbnail" style="height:120px;">
+                <span  class="order btn-info pull-right "
+                           style="" pid="{{ product.productId }}">订购</span>
+             <br><br>
+                <a href="./subject/{{ product.productId }}" class=" btn-success pull-right " role="button"
+                           style="">详情</a>
 
+                <br><br>
+                 {% if product.productId  in orders %}
+                 <span class="label label-default pull-right">
+                     购买过
+                 </span>
+                 {% endif %}
+             </div>
         </div>
 
-    </div>
+                    {% endfor %}
+                {% else %}
+                     <h4>您没有订单，随机推荐</h4>
+                    {% for product in self_random %}
+                         <div class="col-sm-11 col-md-11">
+            <div class="thumbnail" style="height:120px;">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <a href="./subject/">
+                            <img src="{{product.picUrl}}" class="img-responsive pull-left" alt="Responsive image"
+                                 style=" height:100px;">
+                        </a>
+                    </div>
+                    <div class="col-sm-9">
+                        <span style="color: #11a3fc"> {{product.name}}</span><br>
+                        <span class="label label-success">{{ product.classBrandName }}</span>
+                        &nbsp;
+                        <span style="color: #3c763d"> 出发城市:</span> {{product.departCity}}
+                         &nbsp;
+                        <span style="color: #985f0d">满意度:</span> {{product.satisfaction}}%
+                         &nbsp;
+                        <span style="color: slateblue">出游人数:</span> {{product.travelNum}}人
+                         &nbsp;
+                        <span style="color: #28a4c9">钻级:</span>{{ product.productLevel }}
+                        <br>
+                         <span style="color: #28a4c9">推荐理由:</span>{{ product.productFeature }}
+                        <br>
+                        {% for tag in product.conditionTagCombination %}
+                            <span class="label label-info"> {{ tag }}</span>
+                        {% endfor %}
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">随机一下，试试运气。<span class="glyphicon glyphicon-refresh " title="点我随机-click it"></span></h3>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="panel-body ">
-            <div class="row">
+        <div class="col-sm-1 col-md-1">
+             <div class="thumbnail" style="height:120px;">
+                <span  class="order btn-info pull-right "
+                           style="" pid="{{ product.productId }}">订购</span>
+             <br><br>
+                <a href="./subject/{{ product.productId }}" class=" btn-success pull-right " role="button"
+                           style="">详情</a>
 
-                    <div class="col-sm-4 col-md-2" >
-                        <div class="thumbnail" style="height:330px;">
-                            <a href="./subject/{{selfmovies_random[0].id }}" id="00">
-                                <img src="{{selfmovies_random[0]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="01">
-                            </a>
-                            <div class="caption" >
-
-                                <h4 class = "single-row" id="02">{{ selfmovies_random[0].name | make_name_to_one }}</h4>
-                                <p>
-                                    <a href="/subject/{{selfmovies_random[0].id }}" class="btn btn-primary" role="button" id="03">详情</a>
-                        &nbsp; &nbsp; &nbsp; &nbsp;
-                                    <span  class="btn btn-default" role="button">
-                   {% if selfmovies_random[0].id  in likemovies %}
-
-                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[0].id }}" id="04">
-                    </span>
-                            {% else %}
-                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[0].id }}"  id="04">
-                    </span>
-                            {% endif %}
-                        </span>
-                                </p>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-            <div class="col-sm-4 col-md-2" >
-                        <div class="thumbnail" style="height:330px;">
-                            <a href="./subject/{{selfmovies_random[1].id }}" id="10">
-                                <img src="{{selfmovies_random[1]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="11">
-                            </a>
-                            <div class="caption" >
-
-                                <h4 class = "single-row" id="12">{{ selfmovies_random[1].name | make_name_to_one }}</h4>
-                                <p>
-                                    <a href="/subject/{{selfmovies_random[1].id }}" class="btn btn-primary" role="button" id="13">详情</a>
-                        &nbsp; &nbsp; &nbsp; &nbsp;
-                                    <span  class="btn btn-default" role="button">
-                   {% if selfmovies_random[1].id  in likemovies %}
-
-                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[1].id }}" id="14">
-                    </span>
-                            {% else %}
-                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[1].id }}" id="14">
-                    </span>
-                            {% endif %}
-                        </span>
-                                </p>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-            <div class="col-sm-4 col-md-2" >
-                        <div class="thumbnail" style="height:330px;">
-                            <a href="./subject/{{selfmovies_random[2].id }}" id="20">
-                                <img src="{{selfmovies_random[2]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="21">
-                            </a>
-                            <div class="caption" >
-
-                                <h4 class = "single-row" id="22">{{ selfmovies_random[2].name | make_name_to_one }}</h4>
-                                <p>
-                                    <a href="/subject/{{selfmovies_random[2].id }}" class="btn btn-primary" role="button" id="23">详情</a>
-                        &nbsp; &nbsp; &nbsp; &nbsp;
-                                    <span  class="btn btn-default" role="button">
-                   {% if selfmovies_random[2].id  in likemovies %}
-
-                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[2].id }}" id="24">
-                    </span>
-                            {% else %}
-                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[2].id }}" id="24">
-                    </span>
-                            {% endif %}
-                        </span>
-                                </p>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-            <div class="col-sm-4 col-md-2" >
-                        <div class="thumbnail" style="height:330px;">
-                            <a href="./subject/{{selfmovies_random[3].id }}" id="30">
-                                <img src="{{selfmovies_random[3]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="31">
-                            </a>
-                            <div class="caption" >
-
-                                <h4 class = "single-row" id="32">{{ selfmovies_random[3].name | make_name_to_one }}</h4>
-                                <p>
-                                    <a href="/subject/{{selfmovies_random[3].id }}" class="btn btn-primary" role="button" id="33">详情</a>
-                        &nbsp; &nbsp; &nbsp; &nbsp;
-                                    <span  class="btn btn-default" role="button">
-                   {% if selfmovies_random[3].id  in likemovies %}
-
-                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[3].id }}" id="34">
-                    </span>
-                            {% else %}
-                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[3].id }}" id="34">
-                    </span>
-                            {% endif %}
-                        </span>
-                                </p>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-            <div class="col-sm-4 col-md-2" >
-                        <div class="thumbnail" style="height:330px;">
-                            <a href="./subject/{{selfmovies_random[4].id }}" id="40">
-                                <img src="{{selfmovies_random[4]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="41">
-                            </a>
-                            <div class="caption" >
-
-                                <h4 class = "single-row" id="42">{{ selfmovies_random[4].name | make_name_to_one }}</h4>
-                                <p>
-                                    <a href="/subject/{{selfmovies_random[4].id }}" class="btn btn-primary" role="button" id="43">详情</a>
-                        &nbsp; &nbsp; &nbsp; &nbsp;
-                                    <span  class="btn btn-default" role="button">
-                   {% if selfmovies_random[4].id  in likemovies %}
-
-                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[4].id }}" id="44">
-                    </span>
-                            {% else %}
-                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[4].id }}" id="44">
-                    </span>
-                            {% endif %}
-                        </span>
-                                </p>
-
-                            </div>
-                        </div>
-                    </div>
-
-            <div class="col-sm-4 col-md-2" >
-                        <div class="thumbnail" style="height:330px;">
-                            <a href="./subject/{{selfmovies_random[5].id }}" id="50">
-                                <img src="{{selfmovies_random[5]['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;" id="51">
-                            </a>
-                            <div class="caption" >
-
-                                <h4 class = "single-row" id="52">{{ selfmovies_random[5].name | make_name_to_one }}</h4>
-                                <p>
-                                    <a href="/subject/{{selfmovies_random[5].id }}" class="btn btn-primary" role="button" id="53">详情</a>
-                        &nbsp; &nbsp; &nbsp; &nbsp;
-                                    <span  class="btn btn-default" role="button">
-                   {% if selfmovies_random[5].id  in likemovies %}
-
-                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{selfmovies_random[5].id }}" id="54">
-                    </span>
-                            {% else %}
-                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{selfmovies_random[5].id }}" id="54">
-                    </span>
-                            {% endif %}
-                        </span>
-                                </p>
-
-                            </div>
-                        </div>
-                    </div>
+                <br><br>
+                 {% if product.productId  in orders %}
+                 <span class="label label-default pull-right">
+                     购买过
+                 </span>
+                 {% endif %}
+             </div>
+        </div>
+                    {% endfor %}
+                {% endif %}
 
             </div>
 
@@ -315,48 +217,6 @@
     </div>
 
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">我喜欢的旅游</h3>
-        </div>
-        <div class="panel-body ">
-            <div class="row">
-                {% for item in selfmovies_hot %}
-                    <div class="col-sm-4 col-md-2" >
-                        <div class="thumbnail" style="height:330px;">
-                            <a href="./subject/{{item.id }}">
-                                <img src="{{item['img_url']}} " class="img-responsive" alt="Responsive image" style="height:233px;">
-                            </a>
-                            <div class="caption" >
-
-                                <h4 class = "single-row">{{ item.name | make_name_to_one }}</h4>
-                                <p>
-                                    <a href="/subject/{{item.id }}" class="btn btn-primary" role="button">详情</a>
-                        &nbsp; &nbsp; &nbsp; &nbsp;
-                                    <span  class="btn btn-default" role="button">
-                   {% if item.id  in likemovies %}
-
-                    <span class="glyphicon glyphicon-heart" aria-hidden="true" data-class="{{item.id }}">
-                    </span>
-                            {% else %}
-                            <span class="glyphicon glyphicon-heart-empty" aria-hidden="true" data-class="{{item.id }}">
-                    </span>
-                            {% endif %}
-                        </span>
-                                </p>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-                {% endfor %}
-
-            </div>
-
-        </div>
-
-    </div>
 
 </div>
 

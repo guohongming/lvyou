@@ -92,20 +92,10 @@ def classify(this_tag):
 @login_required
 def self():
     id = session['user_id']
-    db.from_user_like_to_recommend(int(id))
-    self_movies = db.get_self_movies(int(id))
-    selfmovies_random = db.get_random_movies()
-    selfmovies_hot_ids = db.get_likes_from_id(id)
-    selfmovies_hot = []
-    for i in selfmovies_hot_ids:
-        itm = db.get_iterm_data(i)
-        selfmovies_hot.append(itm)
 
-        #if len(selfmovies_hot)>6:
-        #   selfmovies_hot = selfmovies_hot[:6]
-    likes = db.get_likes_from_id(int(id))
+    self_random = db.get_random_movies()
 
-    return render_template('self.html', selfmovies=self_movies, selfmovies_random=selfmovies_random, selfmovies_hot=selfmovies_hot, likemovies=likes)
+    return render_template('self.html', self_products=None, self_random=self_random)
 
 
 @movie_blueprint.route('/order', methods={'GET'})
