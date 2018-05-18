@@ -122,8 +122,8 @@
         </div>
         <div class="col-sm-1 col-md-1">
              <div class="thumbnail" style="height:120px;">
-                 <span href="./subject/" class=" btn-info pull-right "
-                           style="">订购</span>
+                <span  class="order btn-info pull-right "
+                           style="" pid="{{ product.productId }}">订购</span>
              <br><br>
                 <a href="./subject/{{ product.productId }}" class=" btn-success pull-right " role="button"
                            style="">详情</a>
@@ -231,41 +231,20 @@ var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
 
 
     $(function(){
+        $(".order").click(function() {
 
-        $(".btn-default").click(function() {
+            var movie_id= $(this).attr("pid");
 
-            var like_cion = $(this).find(".glyphicon");
-            var movie_id= like_cion.attr("data-class");
-            if (like_cion.hasClass("glyphicon-heart-empty")) {
                 $.getJSON($SCRIPT_ROOT + '/like',
                         {
                             flag: 1,
-                            movieid:movie_id
+                            product_id:movie_id
 
                         },
                         function (data) {
-                           like_cion.removeClass("glyphicon-heart-empty").addClass("glyphicon-heart");
+                            alert("下单成功")
                         }
                 );
-
-
-            }
-
-            else{
-                 $.getJSON($SCRIPT_ROOT + '/like',
-                        {
-                            flag: 0,
-                            movieid:movie_id
-                        },
-                        function (data) {
-                            like_cion.removeClass("glyphicon-heart").addClass("glyphicon-heart-empty");
-                        }
-                );
-
-
-            }
-
-
         });
     });
 </script>
