@@ -37,7 +37,7 @@ class DataBase(object):
     #  根据id 查询信息,返回一条记录的数据
     def get_iterm_data(self, this_id):
         item_from_db = self.product_info.find_one({'productId': int(this_id)})
-        print(item_from_db)
+        # print(item_from_db)
         return item_from_db
 
     # # 根据分类/skip/limit 查询
@@ -131,41 +131,33 @@ class DataBase(object):
             orders = []
         return orders
 
-    # def from_user_like_to_recommend(self, id):
-    #     user = self.movie_db.userinfo.find_one({'id': int(id)})
-    #     likemovies = user['like_movies']
-    #     if len(likemovies) == 0:
-    #         movie_recom = []
-    #     if len(likemovies) == 1:
-    #         movie0 = self.movie_db.movierelation.find_one({'id': likemovies[0]})
-    #         movie_recom0 = movie0['relation'][1:13]
-    #         movie_recom = movie_recom0
-    #     if len(likemovies) == 2:
-    #         movie0 = self.movie_db.movierelation.find_one({'id': likemovies[0]})
-    #         movie_recom0 = movie0['relation'][1:7]
-    #         movie0 = self.movie_db.movierelation.find_one({'id': likemovies[1]})
-    #         movie_recom1 = movie0['relation'][1:7]
-    #         movie_recom = movie_recom0 + movie_recom1
-    #     if len(likemovies) == 3:
-    #         movie0 = self.movie_db.movierelation.find_one({'id': likemovies[0]})
-    #         movie_recom0 = movie0['relation'][1:5]
-    #         movie0 = self.movie_db.movierelation.find_one({'id': likemovies[1]})
-    #         movie_recom1 = movie0['relation'][1:5]
-    #         movie0 = self.movie_db.movierelation.find_one({'id': likemovies[2]})
-    #         movie_recom2 = movie0['relation'][1:5]
-    #         movie_recom = movie_recom0 + movie_recom1 + movie_recom2
-    #
-    #     if len(likemovies) > 3:
-    #         movie0 = self.movie_db.movierelation.find_one({'id': likemovies[0]})
-    #         movie_recom0 = movie0['relation'][1:4]
-    #         movie0 = self.movie_db.movierelation.find_one({'id': likemovies[1]})
-    #         movie_recom1 = movie0['relation'][1:4]
-    #         movie0 = self.movie_db.movierelation.find_one({'id': likemovies[2]})
-    #         movie_recom2 = movie0['relation'][1:4]
-    #         movie0 = self.movie_db.movierelation.find_one({'id': likemovies[3]})
-    #         movie_recom3 = movie0['relation'][1:4]
-    #         movie_recom = movie_recom0 + movie_recom1 + movie_recom2 + movie_recom3
-    #     self.movie_db.userinfo.update({"id": id}, {"$set": {"recommend_movies": movie_recom}})
+    def get_recommend(self, ids):
+        slimilar_list= []
+        if len(ids) is 0:
+            return None
+        if len(ids) is 1:
+            slimilar_list = self.similar.find_one({"product_id":int(ids[0])})["similar_list"]
+        if len(ids) is 2:
+            s0 = self.similar.find_one({"product_id":int(ids[0])})["similar_list"]
+            s1 = self.similar.find_one({"product_id":int(ids[1])})["similar_list"]
+            slimilar_list = s0[0:10] +s1[0:10]
+        if len(ids) is 3:
+            s0 = self.similar.find_one({"product_id": int(ids[0])})["similar_list"]
+            s1 = self.similar.find_one({"product_id": int(ids[1])})["similar_list"]
+            s2 = self.similar.find_one({"product_id": int(ids[2])})["similar_list"]
+            slimilar_list = s0[0:10] + s1[0:5] +s2[0:5]
+        if len(ids) > 3:
+            s0 = self.similar.find_one({"product_id": int(ids[0])})["similar_list"]
+            s1 = self.similar.find_one({"product_id": int(ids[1])})["similar_list"]
+            s2 = self.similar.find_one({"product_id": int(ids[2])})["similar_list"]
+            s3 = self.similar.find_one({"product_id": int(ids[3])})["similar_list"]
+            slimilar_list = s0[0:5] + s1[0:5] + s2[0:5] +s3[0:5]
+        result = []
+        for i in slimilar_list:
+            result.append(self.get_iterm_data(int(i)))
+        if len(result) is 0:
+            return None
+        return result
     #
     #     return 1
     #

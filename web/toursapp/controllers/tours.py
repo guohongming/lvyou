@@ -92,10 +92,16 @@ def classify(this_tag):
 @login_required
 def self():
     id = session['user_id']
+    orders = db.get_orders_from_id(id)
+    result = []
+    for item in orders:
+        if item["product_id"] not in result:
+            result.append(item["product_id"])
+    self_products= db.get_recommend(result)
 
     self_random = db.get_random_movies()
 
-    return render_template('self.html', self_products=None, self_random=self_random)
+    return render_template('self.html', self_products=self_products, self_random=self_random)
 
 
 @movie_blueprint.route('/order', methods={'GET'})
